@@ -1,0 +1,148 @@
+        <!DOCTYPE HTML>
+        <html>
+            <head>
+                <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+                <link rel="stylesheet" type="text/css" href="../style.css"/>
+            </head>
+            <body>
+                
+                
+                                    <h1>জ্যাঙ্গো কন্টেন্ট ফ্রেমওয়ার্ক</h1>
+                    <p>জ্যাঙ্গোর ORM আপনার ডাটাবেইজ এক্সপিরিয়েন্সকে অনেকটাই সহজতর করে তোলে। এক কথায় বলতে গেলে, জ্যাঙ্গো আপনাকে দেয় ডাটাবেইজ (SQL/রিলেশনাল ডিবি) এর উপর একটি পাইথনিক র‍্যাপার যা ডাটাবেইজের অভ্যন্তরীণ ব্যপার এমনকি SQL-কে লুকিয়ে রাখে এবং আপনি শুধুমাত্র কিছু ক্লাস লিখে ও সেই ক্লাসের মেথড কল করেই আপনার ডাটাবেইজ টেবলের সৃষ্টি, রো অ্যাড/রেমুভ, কুয়েরী ইত্যাদি করতে পারবেন। এর জন্য জ্যাঙ্গোর ব্যবহৃত কনসেপ্ট হল মডেল।</p>
+<p>মডেল আপাতদৃষ্টিতে একটি পাইথন ক্লাস যার বিশেষ কিছু ক্ষমতা রয়েছে, নিজেকে ডাটাবেইজ সিস্টেমের কাছে বোধগম্য করে তোলা এর মধ্যে অন্যতম। একবার সেটিংসে (settings.py) বলে দেওয়ার পর, বেশিরভাগ ক্ষেত্রেই আপনাকে আর জানতে হবে না যে ডাটাবেইজ ম্যানেজমেন্ট সিস্টেমটি কী ছিল। syncdb কমান্ডের পর জ্যাঙ্গো সেটিংস্‌ থেকে ডাটাবেইজ ফ্লেভার জেনে নিয়ে অতঃপর মডেলগুলিকে ট্রান্সলেট করে ওই ডাটাবেইজের ডি ডি এলে, আর যখন আপনি কোন ডাটা কোন টেবলে অ্যাড করতে চান, তাহলে তার সাথে ম্যাপড মডেলটির একটি নতুন অবজেক্ট তৈরী করুন (বিশেষ কিছু নিয়ম ফলো করে) আর ডাটাবেইজ থেকে জ্যাঙ্গোর কথা বলিয়ে দিবে ORM এবং মডেল API।</p>
+<p>কাজেই বুঝা যাচ্ছে যে, প্রতিটি SQL ফিল্ডের একটি পাইথনিক রূপ রয়েছে যার মাধ্যমে জ্যাঙ্গো মডেল পাইথন থেকে ডি বি অথবা ডি বি থেকে পাইথনে ওঠানামা করে, আবার কিছু বিশেষ মেথড রয়েছে যার মাধ্যমে পাইথন থেকে SQL ও SQL থেকে পাইথনে ওঠানামা করে। প্রথমটি হল অ্যাট্রিবিউটের ও দ্বিতীয়টি বিহেভিয়ারের মত (অবজেক্ট ওরিয়েন্টেড চিন্তা করতে গেলে)।</p>
+<p>আমার এই পোস্টের মূল বিষয় জ্যাঙ্গো ORM না। আমি আশা করব যারা জ্যাঙ্গো পারেন কিছুটা আর ORM নিয়েও কিছু ঘাটাঘাটি করেছেন তারা বেশি লাভবান হবেন এই পোস্ট থেকে। আমার এই পোস্টের মূল বক্তব্য হবে (যা টাইটেল সম্মত) &ldquo;জ্যাঙ্গো কন্টেন্ট ফ্রেমওয়ার্ক&quot;।</p>
+<p>কখনও কি ফেইসবুকের ডাটাবেইজ নিয়ে চিন্তা করেছেন? কিরকম হতে পারে তাদের ডাটাবেইজের স্ট্রাকচার? হয়ত বিলিয়নেরও উপর রো নিয়ে স্কেল করার জন্য ফেইসবুকের আসল স্ট্রাকচার আমাদের চিন্তা করা স্ট্রাকচারের মত হবে না, কিন্তু একটা চেষ্টা কি করা যায়? ঠিক আছে, তো আমাদের কাছে থাকল কিছু &quot;পোস্ট টাইপ&rdquo;, যা ইমেজ হতে পারে, স্ট্যাটাস হতে পারে, পোল হতে পারে, শেয়ার হতে পারে। যদি জ্যাঙ্গো দিয়ে এমন কিছু করার থাকে তাহলে এদের প্রত্যেকের জন্যেই একটি করে মডেল নিয়োগ করা যায়। একটি &ldquo;গরিবের ফেইসবুক&rdquo; চিন্তা করা যাক, যেখানে ইমেজ আর স্ট্যাটাস রয়েছে শুধু। ইমেজ হতে পারে প্রোফাইল পিকচার, আর স্ট্যাটাস তো স্ট্যাটাসই। জ্যাঙ্গো মডেল হতে পারে নিম্নরূপ (সরলতার জন্য আমি ধরে নিলাম যে সবকিছুই পাবলিক!)</p>
+<pre><code class="prettyprint">
+class Place(models.Model):
+    name = models.CharField(max_length=127)
+    description = models.TextField(blank=True, null=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+    owner = models.ForeignKey(User)
+    creation = models.DateTimeFIeld(auto_now=True)
+    
+class PostModel(models.Model):
+    owner = models.ForeignKey(User)
+    creation = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        abstract = True
+
+class ImagePost(PostModel):
+    image = models.ImageField(upload_to="mugshot/")
+    description = models.TextField(blank=True, null=True)
+    place = models.ForeignKey(Place)
+
+class Status(PostModel):
+    status = models.ImageField()
+</code></pre>
+<p>ঠিক আছে, আমরা কিছু ডাটা খুব সহজেই সেইগুলিতে অ্যাড করতে পারি, আমরা সবাই জ্যাঙ্গো জানি, বড় কোনও ঘটনা নয়।</p>
+<p>এইবার কমেন্টের পালা। আপনার সমস্ত স্ট্যাটাস, আর সমস্ত ইমেজ থাকবে কমেন্টেবল। আবার লোকজন ভোটও দিতে পারবে । আর একটা টাইমলাইন থাকলেও ভাল হত, টুইটার হ্যাসট্যাগ ইউজ করে, সবাই করতেছে আজকাল, আমরাও করব! এইবার কি?</p>
+<p>আপনি যদি জ্যাঙ্গো মোটামোটি পারেন, তাহলে আপনার তাৎক্ষনিক চিন্তা থাকবে, কিছু মডেল তৈরী করা। হয়ত একটি অ্যাবস্ট্রাক্ট বেইজ ক্লাস (কমেন্ট) যেখানে কমেন্টের জেনেরিক সব উপাদান (কে করল, কি করল, কখন করল) থাকবে, আর তারপর সেই অ্যাবস্ট্রাক্ট বেইজ ক্লাস থেকে ইনহেরিট করবে ImagePostComment, StatusComment, PlaceComment ইত্যাদি। একইভাবে, একটি জেনেরিক টাইমলাইন, একটি জেনেরিক ট্যাগ, একটি জেনেরিক ভোট। কিন্তু কিছু ঝামেলা আছে।</p>
+<p>তাৎক্ষনিক ঝামেলা বোঝা যাবে টাইমলাইন ও ট্যাগের ক্ষেত্রে, আপনি চাইবেন আপনার প্রোফাইলে দেখা মাত্র আপনার সমস্ত অ্যাক্টিভিটি কেউ দেখতে পাবে। আপনি কবে কী পোস্ট করলেন, কখন কাকে অ্যাড করলেন, কবে আপনার জন্মদিন ইত্যাদি ইত্যাদি। আর টাইমলাইনের ব্যপ্তিও হবে বিশাল, কতগুলি ক্লাস বানাবেন আপনি? FriendHistoryTimeline? NotificationTimeline? StatusTimeline? একই জিনিস ট্যাগেও চলবে। আপনার ন্যাচারাল রিস্পন্স হবে যে আপনি &ldquo;programming&rdquo; ট্যাগে ক্লিক করলে সেই ট্যাগবিশিষ্ট সকল পোস্ট, ইমেজ, স্ট্যাটাস একই সাথে চলে আসবে, সর্ট/সার্চ হবে একত্রে। এখন করবেন কি? abstract = False করে দিবেন বেইজ ক্লাসে? তাহলে তো কয়েকশতেই কাইত! আবার কমেন্ট যদিও ওইসব ঝামেলা থেকে কিছুটা মুক্ত, তবে আগামীতে যখন আপনি &ldquo;গল্প&rdquo; অথবা &ldquo;বিক্রয়&rdquo; সেকশন খুলবেন, তখন? আবার সেই কমেন্ট মডেল, ফর্ম তৈরী, ইত্যাদি? লাইফ আরেকটু সহজ হলে কি হত না?</p>
+<p>উপরের প্রশ্নের উত্তরের জন্য জ্যাঙ্গো আপনাকে দেয় কন্টেন্ট ফ্রেমওয়ার্ক। একে আপনি বলতে পারেন ফরেন কী জগতের মিস্টিক (এক্স-মেন দেখেছেন?)। এর কাজ? একটি ইউনিভারসাল <strong>&ldquo;ফরেন কী&rdquo;</strong> টাইপের কিছু সৃষ্টি করা এবং যে কাউকে ধারণ করা সেই ইউনিভারসাল <strong>&ldquo;ফরেন কী&rdquo;</strong> তে। রুবী অন্ রেইলসে এটি আছে পলিমরফিক টাইপ হিসাবে, যা আমি মনে করি আরও ভাল একটি নাম এর ব্যবহার অনুযায়ী।</p>
+<p>পলিমরফিক, অর্থাৎ বহুরূপী। রেইলসের লোকজন নাম দিয়েছে ভালোই, কিন্তু জ্যাঙ্গো কোন দুঃখে একে কন্টেন্ট টাইপ বলতে গেল? এর পিছনে কিছু কাহিনী আছে যা পোস্টের শেষে বোঝা যাবে।</p>
+<p>চলুন টাইমলাইন/অ্যাক্টিভিটি নিয়ে ভাবি। কেমন হতে পারে ডাটাবেইজ? এক কথায়, কর্তৃকারক, কর্মকারক, করন কারক, হয়ত অধিকরণ কারক। কেউ কিছু করেছে, কারও উপর করেছে, কোনও একটি সময়ে করেছে, হয়ত কোনও একটি স্থানে করেছে। ডাটাবেইজের ভাষায় বলতে গেলে, যখন কে করেছে তা হবে ইউজারের দিকে একটি <strong>&ldquo;ফরেন কী&rdquo;</strong>, কি করেছে? তা হতে পারে একটি <strong>স্ট্রিং</strong> (যথা অ্যাড, রিমুভ, আপডেট), কার উপর করেছে, তা হতে পারে একটি <strong>পোষ্ট</strong>। এইরূপ মান হলে আমরা পাব UserPostActivity, যার গঠন হতে পারে-</p>
+<pre><code class="prettyprint">
+class UserPostActivity(models.Model):
+    actor = models.ForeignKey(User)
+    verb = models.CharField(max_length=255)
+    object = models.ForeignKey(Post)
+    timestamp = models.DateTimeField(auto_now=True)
+    
+    
+    def __unicode__(self):
+        """ Mafinar updated 'Django Rocks' 5 minutes ago (hint: throw some 's around?)"""
+        return "{} {} {} at {}".format(actor, verb, object, _since(timestamp))
+</code></pre>
+<p>ভালো কথা, আরও ৫০ টি এমন ক্লাস তৈরী করতে হবে, আবার একটি জেনেরিক ক্লাস বানাতে হবে যা এদের সকলের রেফারেন্সকে রাখে ও একত্রিত করে দেখার একটি মাধ্যম হিসাবে কাজ করে। তাহলে সিউর থাকেন, &lsquo;Django Rocks&rsquo; এর পরবর্তী স্ট্যাটাস হবে 'Life is difficult'। আমার (ও আমি সিউর অনেকেরই) মতে, কোডটি হওয়া উচিত ছিল</p>
+<pre><code class="prettyprint">
+class Activity(models.Model):
+    actor = models.ForeignKey(models._meta.AnyModel())
+    verb = models.CharField(max_length=255)
+    target = models.ForeignKey(models._meta.AnyModel())
+    timestamp = models.DateTimeField(auto_now=True)
+    
+    
+    def __unicode__(self):
+        """ Mafinar updated 'Django Rocks' 5 minutes ago (hint: throw some 's around?)"""
+        return "{} {} {} at {}".format(actor, verb, target, _since(timestamp))
+
+    @classmethod
+    def action(cls, by_who, what, to_whom):
+        Activity.objects.create(actor=who, verb=what, target=on_what)
+        
+    # When a status is updated
+    def status_update(request, pk):
+        try:
+            status = Status.objects.get(id=pk)
+            Activity.action(request.user, " created ", status)
+        except:
+            pass
+            # Do whatever you want to do man!
+    ...
+</code></pre>
+<p>[১) উপরের কোড কাল্পনিক এবং কেমন হলে ভালো হত সেই বিষয়ে আমার অভিমত এবং ২) এইসব কেইসের জন্য সিগন্যাল ব্যবহার করা উত্তম যা আমার পরের পোস্টের মূল বিষয় হবে। ]</p>
+<p>জ্যাঙ্গো কন্টেন্ট ফ্রেমওয়ার্ক ঠিক এই কাজটিই করে থাকে, কিন্তু একটু ভিন্নভাবে। এর জন্য চলেন একটু এক্সপেরিমেন্ট করি। আপনার কে কোন জ্যাঙ্গো প্রজেক্টে গিয়ে python manage.py shell টাইপ করুন এবং লিখুন-</p>
+<pre><code class="prettyprint">
+from django.contrib.contenttypes.models import ContentType
+
+contents = ContentType.objects.all()
+content_fields = [i.name for i in ContentType._meta.fields]
+</code></pre>
+<p>কি হল? আপনি কি দেখতে পেলেন আপনার সমস্ত মডেলগুলিকে? আপনি যদি জ্যাঙ্গোর কন্টেন্ট টাইপ ফ্রেমওয়ার্কের সোর্স কোড দেখেন (যে কোন পাইথন লাইব্রেরীতে আপনার বেস্ট ফ্রেন্ড হল সোর্স কোড, বিশেষ করে জ্যাঙ্গোতে) এবং management.py ফাইলটি দেখেন (django/contrib/contenttypes/management.py) তাহলে দেখবেন যে post_syncdb সিগন্যালের পর যে হ্যান্ডলার ফাংশন কল করা হয়, তা প্রতি syncdb কলের পর নতুন করে সৃষ্ট মডেলের জন্য কন্টেন্ট টাইপে একটি এন্ট্রি দেয়, আর ডিলিট করা মডেলের এন্ট্রিকে রিমুভ করে দেয়। অর্থাৎ, কন্টেন্ট হল জ্যাঙ্গো ORM এর নিজস্ব মেটা মডেল, যেখানে সমস্ত মডেলের নাম/ঠিকানা রয়েছে।</p>
+<p>কাজ একটু সহজ হয়ে গেল না আমাদের জন্য? ধরুন আপনি &ldquo;যে কোন মডেলের&rdquo; পরিবর্তে বলছেন <em>'কন্টেন্ট টাইপ থেকে পাওয়া &ldquo;ইমেজ&quot;নামক মডেলের ২৫ <strong>&quot;প্রাইমারি কী&rdquo;</strong> যার আছে তাকে&rsquo;</em>, <strong>&ldquo;ফরেন কী&rdquo;</strong> করে কি? রিলেশনশিপ স্থাপন করে অন্য <u>&ldquo;একটি&rdquo;</u> মডেলের সাথে আর তার মাধ্যম হয় <strong>&ldquo;কী&rdquo;</strong>, আর যদি আপনি ওই অন্য <u>&ldquo;একটি&rdquo;</u> কে <u>&ldquo;যে কোন একটি&rdquo;</u> তে পরিণত করতে চান, তাহলে আপনার কি লাগবে? আরও একটি এন্ট্রি, এবং সর্বসাকুল্যে একটি টুপল, অর্থাৎ (কোন মডেল?, কোন কী?) কন্টেন্ট টাইপ আপনাকে দিচ্ছে সমস্ত মডেলের একটি ভাণ্ডার, কাজেই আপনি ফরেন কী হিসাবে কন্টেন্ট টাইপকে রাখলে টুপলের প্রথম উপাদান পেয়ে যান, আর দরকার একটি ইন্টিজার ফিল্ড যা সিলেক্ট করা কন্টেন্ট টাইপ থেকে পুল করে নিয়ে আসে তার ধারণ করা নাম্বারের আই ডি কে। পেয়ে গেলেন আপনার মাথা ব্যথার ওষুধ। কিন্তু বার বার এরকম করাও তো মুশকিল, আপনাকে এখন একবার কন্টেন্ট টাইপ থেকে, আরেকবার ওই মডেল থেকে get কমান্ড দিয়ে কাজ করতে হবে, এই দুইটি মিলে <strong>&ldquo;ফরেন কী&rdquo;</strong> কে এমুলেট করা গেলে কেমন হত? একটি জেনেরিক <strong>&ldquo;ফরেন কী&rdquo;</strong>? তা খুব ভালভাবেই সম্ভব এবং এর নামও <strong>&ldquo;জেনেরিক ফরেন কী&rdquo;</strong>, যা চাইবে পূর্ব উল্লিখিত সেই টুপলকে আর আপনার কাছ থেকে অতিরিক্ত কমপ্লেক্সিটিকে লুকিয়ে রাখবে। আপনি অন্যান্য <strong>&ldquo;ফরেন কী&rdquo;</strong> এর মতই একে ব্যবহার করতে পারবেন। আমাদের Activity মডেল এখন দাঁড়াল</p>
+<pre><code class="prettyprint">
+class Activity(models.Model):
+    actor_content_type = models.ForeignKey(ContentType, related_name='actor')
+    actor_object_id = models.CharField(max_length=255)
+    actor = generic.GenericForeignKey('actor_content_type', 'actor_object_id')
+
+    verb = models.CharField(max_length=255)
+
+    target_content_type = models.ForeignKey(ContentType, related_name='target', blank=True, null=True)
+    target_object_id = models.CharField(max_length=255, blank=True, null=True)
+    target = generic.GenericForeignKey('target_content_type', 'target_object_id')
+    timestamp = models.DateTimeField(default=now)
+
+    # THE REST SHOULD BE THE SAME
+</code></pre>
+<p>আপনার মূল চিন্তা হবে actor, verb, target, timestamp কে নিয়ে, *_content_type ও *_object_id নিয়ে খেলা ব্যাকগ্রাউন্ডে করবে কন্টেন্ট ফ্রেমওয়ার্ক।</p>
+<p>এখন আসি এদের নিয়ে কাজ করা নিয়ে। আবার কিছু বিষয়, ১) নরমাল <strong>&ldquo;ফরেন কী&rdquo;</strong> তে যেমন উলটা রিলেশনশিপ দেয় (যদি ইমপ্লয়ী তে ডিপার্টমেন্ট ফরেন কী থাকে তাহলে ডিপার্টমেন্টে থাকবে ইমপ্লয়ি_সেট যা সেইসব ইমপ্লয়িকে টানবে যাদের ফরেন কী হিসাবে ওই ডিপার্টমেন্টটি রয়েছে) <strong>&ldquo;জেনেরিক ফরেন কী&rdquo;</strong> এর ক্ষেত্রে ওরকম উলটা <strong>&ldquo;ফরেন কী&rdquo;</strong> থাকে না, আপনাকে বলে দিতে হবে, আর তা করতে হবে GenericRelation এর মাধ্যমে। অর্থাৎ,</p>
+<pre><code class="prettyprint">
+from django.contrib.contenttypes import generic
+
+
+class ImagePost(models.Model):
+    # After all the fields
+    activities = generic.GenericRelation(Activity)
+</code></pre>
+<p>২) আপনি সরাসরি ফিল্টার/এক্সক্লিউডের মধ্যে GenericForeignKey/GenericRelation কে ব্যবহার করতে পারবেন না ৩) মডেল ফর্মে এরা আসবে না। কিন্তু ContentType আসবে, কারণ সেটি তো সাধারণ <strong>&ldquo;ফরেন কী&rdquo;</strong>, তাহলে আপনি যদি চান Post মডেলের উপর করা সমস্ত Activity বের করতে তাহলে? আপনার জন্য এখানে একটি চমৎকার হেল্পার মেথড রয়েছে ContentType এর Manager এ (Manager এর কাজ কি জানেন তো? না জানলে ও জানতে চাইলে কমেন্টে লিখুন)। এটি যে কোন অবজেক্ট নিয়ে এর সাথে ম্যাপড কন্টেন্ট টাইপকে ফেরত দেয়, আর তা হল, get_for_model() আরও একটি রয়েছে, get_for_models() যা একাধিক মডেল/কন্টেন্ট টাইপ ম্যাপিং ফেরত দেয়। অর্থাৎ, আপনি যদি, একটি পোস্ট অবজেক্ট পান এবং এর ক্লাসের সবার Activity চান তাহলে আপনি লিখবেন,</p>
+<pre><code class="prettyprint">
+post_content = ContentType.objects.get_for_model(my_post)
+all_activities_of_the_class = Activity.objects.filter(target_content_type=post_content)
+all_activities_of_this_model = Activity.objects.filter(target_content_type=post_content, target_object_id=my_post.id)
+
+# Reverse
+image_activities = ImagePost.activities.all()
+</code></pre>
+<p>কাজেই দেখলাম, যদিও কন্টেন্ট টাইপের কারণে, মডেলের একটি <strong>&ldquo;জিনেরিক ফরেন কী&rdquo;</strong> এবং উলটা <strong>&ldquo;ফরেন কী&rdquo;</strong> এর ব্যবস্থা করা যায়, তবে ডাটাবেইজ কুয়েরির ক্ষেত্রে আপনাকে একটু কষ্ট করে অবজেক্টের কন্টেন্ট টাইপ ও আই ডী (ID/PK) নিয়ে একটু খেলতে হবেই, <strong>&ldquo;জিনেরিক কী&rdquo;</strong> শুধুমাত্র সাহায্য করে সৃষ্টি ও অ্যাসাইন্মেন্ট এর সময়ে, যা আমি মনে করি অনেক গুরুত্বপূর্ণ। আর পারফরম্যান্স? এটি আসলে আপনার সাইটের ডাটার উপর নির্ভর করে, কয়েক হাজার ডাটার জন্য আমি কোন প্রবলেম পাইনি, কিন্তু যখন ডাটা লাখের কোঠায় পৌছবে, তখন আমি মনে করি আপনার পক্ষেও সম্ভব হবে, স্কেলিংয়ের মাল-মশলা জোগাড় করার, কারণ ততক্ষণে তো আপনি বড়লোক হয়েই যাবেন। আর এরা কিন্তু আসলে একটি <strong>&ldquo;ফরেন কী&rdquo;</strong> ও নাম্বার (ID/PK) এর সম্মিলিত কুয়েরি, বেশি প্রবলেম হলে আপনি SQL ব্যবহার করতে পারেন, অথবা, একটি মাইগ্রেশন স্ক্রিপ্ট লিখে ডাটাকে কোন NoSQL এ ফেলে দিতে পারেন, যেহেতু এই রকম, আন স্ট্রাকচারড ডাটা নিয়ে তারা ভাল খেলতে পারে। কিন্তু এগুলো সবই হবে যখন আপনার ডাটা মিলিয়নের কোঠায় পরবে, ওই সময়ে, অনেক ডাটা নিয়ে খেলতে অমনিতেও আপনাকে হবে।</p>
+<p>কন্টেন্ট টাইপের মাধ্যমে আপনি বহু সমস্যার সমাধান করতে পারেন। এখানে তার মধ্যে কিছু দেয়া হল, বহু অ্যাপ রয়েছে যারা একে লেভেরেজ করে থাকে, এর মধ্য থেকে জ্যাঙ্গোর নিজস্ব সাইট ফ্রেমওয়ার্ক, কমেন্ট ফ্রেমওয়ার্ক, অনেক পপুলার django-taggit, django-activity-stream, django-notification-hq, django-postman ইত্যাদি রয়েছে, বিশেষ করে django-activity-stream আমার খুবই প্রিয়। হয়ত কোন একদিন সেটি নিয়ে লিখব। আর কন্টেন্ট টাইপের সাথে আপনাকে আরও শক্তিশালী করবে জ্যাঙ্গোর সিগ্ন্যালিং ফ্রেমওয়ার্ক যা নিয়ে আমি আমার পরবর্তী জ্যাঙ্গো পোস্টে লিখব।</p>
+<p>আপনাদের সকলকে ঈদ মুবারক জানিয়ে এখানে শেষ করছি। ধন্যবাদ।</p>
+                
+                
+                
+                
+                
+                
+                                <div id="footer">
+                <span id="timestamp"> October 5th, 2014 6:14pm </span>
+                                                      <span class="tag">django</span>
+                                      <span class="tag">contenttype</span>
+                                      <span class="tag">tutorial</span>
+                                              </div>
+            </body>
+        </html>
+
+        

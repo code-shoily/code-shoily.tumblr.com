@@ -1,0 +1,205 @@
+        <!DOCTYPE HTML>
+        <html>
+            <head>
+                <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+                <link rel="stylesheet" type="text/css" href="../style.css"/>
+            </head>
+            <body>
+                
+                
+                                    <h1>ম্যাক্রো, অথবা ল্যাঙ্গুয়েজের প্লাস্টিক সার্জারি [ পর্ব ০ (মোটিভেশন) ]  </h1>
+                    <p>[ আমি এখানে লিস্প ম্যাক্রো নিয়ে কথা বলছি, সি অথবা ভিজুয়াল বেসিক ম্যাক্রো না। এটা লিস্প ম্যাক্রো, যা অনেকটা ভিন্ন, আর প্রচণ্ড শক্তিশালী। ] </p>
+<p>একটি নির্দিষ্ট ডোমেইনের প্রব্লেমকে ট্যাকল করার জন্য মাঝে মাঝে ল্যাঙ্গুয়েজের সিনট্যাক্স নিয়ে এমনভাবে খেলাধুলা করা হয় যেন মনে হয় যে ওই ল্যাঙ্গুয়েজটির জন্মই হয়েছে ওই প্রব্লেমকে ট্যাকল করার জন্য। অথচ আপনি কিন্তু আপনার জানা ল্যাঙ্গুয়েজটির ফাংশন, ক্লাস, লুপ ইত্যাদি ব্যবহার করছেন, হয়ত একটু অস্বাভাবিকভাবে মাঝে মাঝে, কিন্তু ওরকম করে প্রোডুস করা কোড দেখেই বুঝা যায় তা কি করতে যাচ্ছে, হয়ত প্রচলিতভাবে আপনার ল্যাঙ্গুয়েজকে ইউজ করলে অতটা ন্যাচারাল লাগত না। এভাবে এক হাত দু'হাত করে আপনার ল্যাঙ্গুয়েজকে ওভাবে &ldquo;আনন্যাচারালি&rdquo; ব্যবহার করে ওই ডোমেইনের কাছে ন্যাচারাল/রীডাবল কোড প্রস্তুত করার প্যাটার্ন যখন আরও মজবুত ও প্রচলিত হয়ে ওঠে, তখন আপনি কাজ করলেন একটি ডি এস এল (ডোমেইন স্পেসিফিক ল্যাঙ্গুয়েজ) এর উপর। </p>
+<p>নীচের রুবী কোডটি দেখা যাক</p>
+<pre><code class="prettyprint">class CreateComments &lt; ActiveRecord::Migration
+  def change
+    create_table :comments do |t|
+      t.string :commenter
+      t.text :body
+ 
+      # this line adds an integer column called `article_id`.
+      t.references :article, index: true
+ 
+      t.timestamps
+    end
+  end
+end</code>
+</pre>
+<p>আমি রেইলস পারি না, রুবী পারি এক আধটু, কিন্তু এই কোডটি দেখেই বুঝা যাচ্ছে যে ডাটাবেইজ টেবল সংক্রান্ত কিছু হচ্ছে। মাঝখানের অংশটি দেখে মনে হচ্ছে যে টাইপ ডিক্লেয়ার করা হচ্ছে :commenter, :body ইত্যাদি, এখন যদি ওই অংশটুকু t.string(&ldquo;commenter&rdquo;) অথবা t.text(&ldquo;body&rdquo;) লিখা হতো তাহলে কিন্তু নরমাল মেথড কল বুঝা যেত, নিঃসন্দেহে, কিন্তু এই কেইসে কি ন্যাচারাল লাগত? ডাইনামিকালি টাইপড রুবী কোডকে এমনভাবে উপস্থাপন করা হয়েছে যেন মনে হয় প্রায় এস কিউ এল। আর এমনটি সক্ষম হয়েছে রুবীর একটি বিশেষত্বের কারণে, এর মেথড কল করতে ব্রাকেট না দিলে চলে। কোড হয়ে ফ্লুয়েন্ট। এমনটি দেখা যায় অনেক রুবী ফ্রেমওয়ার্কে, রেইলস তার মধ্যে জনপ্রিয়তম।</p>
+<p>পাইথনেও এমন কিছু প্র্যাকটিস আছে, যদিও পাইথনপ্রেমীরা ওই প্র্যাকটিস কম করে (PEP8 অনেকটা তাদের বাধ্য করে কম করতে) , নীচের কোডঃ </p>
+<pre><code class="prettyprint">
+import numpy as np
+
+ar55 = np.arange(25).reshape(5, 5)
+
+print ar[2, 3]
+</code></pre>
+<p>কি হল? পাইথনে আবার কবে থেকে সি# এর মত জ্যাগড অ্যারে ইন্ডেক্সিং করা যায়? (না!) আরেকটু মনোযোগ দিলে বুঝা যাবে, যে এটি কোন নরমাল লিস্ট না, নামপাই এর নিজস্ব অ্যারে (নাম পাই সম্পর্কে জানতে দেখুন <a href="http://goo.gl/gMkxo2" title="আমার পুরাতন এই পোস্টটি" target="_blank">http://goo.gl/gMkxo2</a> ) আর যদি আপনি ar[(2,3)] টাইপ করেন তাহলে একই জবাব পাবেন। অর্থাৎ [] <span>অপারেটরকে ওভারলোডিং করে আপনার জন্য ন্যাচারাল একটি ফিল আনা হয়েছে নামপাই তে। পাইথন টুপল এ আপনি প্রথম ব্রাকেট না দিলেও পারেন (অর্থাৎ (&ldquo;ক&rdquo;, &ldquo;খ&rdquo;, &ldquo;গ&rdquo;) আর <span>&ldquo;ক&rdquo;, &ldquo;খ&rdquo;, &ldquo;গ&rdquo; একি হবে)</span>, আর [] ইনডেক্সকে ওভারলোড করা যায় পাইথনে (__getitem__ দিয়ে), কাজেই [] কে টুপল চিনিয়ে ওতে দেওয়া টুপলটিকে ব্রাকেট ছাড়া ব্যবহার করে এই সিনট্যাক্সকে সিমুলেট করেছে নামপাই। </span> আবার ওই অপারেটর ওভারলোডিংয়ের  মাধ্যমে ar**2 যদি আপনি টাইপ করেন, তাহলে প্রত্যেকটি এলিমেন্টকে স্কয়ার করা হয়, আপনার লিস্ট কম্প্রিহেনশন করার প্রয়োজন পরে না।</p>
+<p>আচ্ছা, ভাল কথা। এখন, আরেকটু আউট অফ দা বক্স চিন্তা করি, আপনি এই টাইপ কোড হয়ত অনেক দেখেন </p>
+<pre><code class="prettyprint"> 
+var dropWhile = function(predicate, list) {
+    var i = 0;
+    while(!predicate(list[i])) {
+        i += 1;
+    }
+    
+    return list.slice(i)
+}
+</code></pre>
+<p>এইবার কল করা যাক</p>
+<pre><code class="prettyprint">
+dropWhile(function(n) {
+    if (n%2 != 0) {
+        return true;
+    }
+    return false;
+}, [12, 34, 14, 41, 5, 7, 8]);
+// =&gt; [41, 5, 7, 8]
+</code></pre>
+<p>তাহলে আমরা একটি ফাংশন তৈরি করলাম যা একটি ক্লোজার (Clojure ল্যাঙ্গুয়েজ না, Closure ল্যাঙ্গুয়েজ ফিচার) নিবে, আরেকটি লিস্ট নিবে এবং ওই ক্লোজারটিকে লিস্টের একটি একটি করে এলিমেণ্ট নিয়ে নিয়ে টেস্ট করবে যে এরা বেজোড় সংখ্যা কিনা, বেজোড় না হলে ফেলে দিবে,আর প্রথম বেজোড় সংখ্যা পাওয়া মাত্রই লিস্টের পরবর্তী সমস্ত এলিমেন্ট ফিরিয়ে দিবে।</p>
+<p>জাভাস্ক্রিপ্ট এই পোস্টের মুল বিষয় নয়, কিন্তু চলুন দেখি একে কিভাবে আরও সৌন্দর্য করা যায় :p </p>
+<p>প্রথমে, প্রেডিকেট ফাংশনটিকে আমরা এক লাইনে নিতে পারতাম সরাসরি n%2 != 0 কে রিটার্ন করিয়ে। ঠিক আছে, হয়ত ম্যাপ ইউজ করা যেত লুপ এর পরিবর্তে।</p>
+<p>আচ্ছা, কোডকে কি নিচের মতো করা যাবে? (না)</p>
+<pre><code class="prettyprint"> 
+var dropWhile = function(list)(predicate_code) { 
+    i = 0 
+    until((predicate_code with list injected) == true) { 
+        i += 1 
+    } return list.slice(i) 
+} 
+// and call it like 
+dropWhile [12, 34, 14, 5, 7, 8] unless (_ % 2) == false 
+    
+</code></pre>
+<p>কোড দেখে তো একে জাভাস্ক্রিপ্ট মনে হয় না, মনে হয় স্কালা ও রুবীর অবৈধ সন্তান :p কিন্তু আমাদের এই কাজ করতে হবে জাভাস্ক্রিপ্টের মধ্যে থেকে, নতুন কোন ল্যাঙ্গুয়েজ আবিষ্কার না করে। সম্ভব? (না)</p>
+<p>জাভাস্ক্রিপ্ট সরাসরি কোড গ্রহণ করে না, তাই আমরা ফাংশন সিনট্যাক্স ব্যবহার করে ক্লোজারকে পাঠাই, আর যেহেতু ফাংশন প্রথম শ্রেণীর নাগরিক (অর্থাৎ ফাংশনকে আপনি অন্য ফাংশনের আর্গুমেন্ট হিসাবে পাঠাতে পারবেন) কাজেই তাকে পাঠিয়ে দেওয়া যে কোন ফাংশনকে কল করে dropWhile ফাংশন এবং ওই কল থেকে পাওয়া আউটপুটকে নিয়ে কাজ করে। কিন্তু আপনি কি পারবেন শুধু কোডকে পাঠাতে ফাংশন আর্গুমেন্ট হিসাবে? আর দ্বিতীয়ত, unless ও until statement যা if ও while এর ওপিঠ, Perl কিংবা Ruby তে থাকলে জাভাস্ক্রিপ্টে নেই, ঠিক যেমন when/whenever অথবা জাভা স্টাইলের forloop সিনট্যাক্স লেভেলে পাইথন অথবা রুবীতে নেই (পাইথনে enumerate আছে, কিন্তু ওটা দেখে আরটিফিসিয়াল মনে হয়, রুবীতে কি আছে এমন কিছু?) </p>
+<p>এইবার নিচের কল্পনাতিটে যাওয়া যাক</p>
+<pre><code class="prettyprint">
+def unless(|body|, |if-true|, |if-false|):
+    if not |body|:
+       execute |if-true|
+    else:
+       execute |if-false|
+
+//Afterwards...
+def odd(n):
+    unless i%2 == 1:
+        return False
+
+    return True
+    
+//This actually runs
+unless(`i%2 == 1`, `return False`, `return True`)
+
+// and places the arguments inside the code body like
+"if not" + `i%2 == 1`:
+    execute `return False`
+"else:"
+    execute `return True`
+    
+// The ultimate result
+if not i%2 == 1:
+    return False
+else:
+    return True
+</code></pre>
+<p>eval টাইপ হয়ে গেল না ব্যপার তা? আর আমরা শুনি eval is evil?</p>
+<p>আমরা কিন্তু এই সময় পর্যন্ত এমন এক প্রকার সিনট্যাক্স ও প্রোগ্রামিং প্রাকটিস নিয়ে কথা বলছি যা ল্যাঙ্গুয়েজে অনুপস্থিত, কাজেই আমরা ইভাল এর লাইনে চিন্তা করছি, ইভাল কাজ করে মূলত অগঠিত স্ট্রিং নিয়ে, আর সেখানেই যত গলদ। যদি আপনার প্রোগ্রামিং ল্যাঙ্গুয়েজ এর মুল স্ট্রাকচারি হয় এমন, যে আপনার কোডই হয় আপনার ডাটা, তাহলে কিন্তু ইভালের প্রশ্ন আসে না। তখন সিনট্যাক্স হয়ে ওঠে মূলত ডাটা স্ট্রাকচার, আর সিনট্যাক্সকে এক্সটেন্ড করা ওই ডাটার গঠনকে এক্সটেন্ড করার মতই, আর এর চেকটাও খুব সহজে সম্ভব কম্পাইলের সময়ে, রানটাইমে না। কাজেই,  এইভাবে চিন্তা করা এভিল না, বরং আপনার প্রোগ্রামিং চিন্তাকে দিবে নতুন মাত্রা। কিন্তু এর পূর্বশর্ত হল, প্রথমত, আপনার ল্যাঙ্গুয়েজকে সাপোর্ট করতে হবে ওই রকম কুংফু, আর দ্বিতীয়ত ল্যাঙ্গুয়েজটিকে হতে হবে এমন, যে এর কোডই এর ডাটা, অর্থাৎ আপনার কোডই আপনার এ এস টি (আবস্ট্রাক্ট সিনট্যাক্স ট্রি)। </p>
+<p>ওগুলো নিয়ে পরবর্তী পোস্টে বলব যখন লিস্পের একটি সূচনা দিব। </p>
+<p>ফিরে আসি ম্যাক্রোতে, ম্যাক্রো হল এমন একটি প্রক্রিয়া জার মাধ্যমে আপনি সাপোর্ট করা ল্যাঙ্গুয়েজটিকে নিজের মতো করে সাজাতে পারবেন। কোডের মধ্যে কোড করতে পারবেন, আরও পরিষ্কারভাবে বলতে গেলে, মনে করুন আপনার একাধিক কোড স্নিপেটে কিছু কমন এলিমেন্ট আছে, যা হয়ত অপারেটর, অথবা ভেরিয়েবল, ফাংশন কল ইত্যাদি, হয়ত ক্লাস অথবা ফাংশন দিয়ে এক্সটেন্ড করতে গেলে <a href="http://c2.com/cgi/wiki?RavioliCode" target="_blank">রাভিওলি কোড</a> হয়ে যাবে। কাজেই আপনি আটকা পরে থাকেন অনেক বেশি বয়লারপ্লেট নিয়ে। কিন্তু, ম্যাক্রো আপনাকে সক্ষম করে কোডের টেম্পলেটে কোড ইঞ্জেক্ট করে ওই কোডকে কম্পাইল করে ফাংশনের মত ব্যবহার করতে। ঠিক যেমন আপনি টেম্পলেট ব্যবহার করেন রুবী অন্ রেইলস অথবা সিম্ফনি ফ্রেমওয়ার্কে, কিন্তু কোড জেনারেশনের জন্য, স্ট্রিং নয়। মনে করুন পুরা ল্যাঙ্গুয়েজই আপনার জিনজা অথবা টুঈগ, তাও এক্সেকিউটেবল।  </p>
+<pre><code class="prettyprint">
+mail_template = """
+Date: {{date|else:"now"}}
+
+Dear {{recipients-name}},
+
+Assalamualaikum. {{ body }}.
+
+Sincerely-
+{{sender-name}}
+"""
+
+render(template, :recipient-name "X", :sender-name "Y", :body "Macro's Rule")
+</code></pre>
+<p>উপরের টেম্পলেটকে দেখেই বুঝা যাচ্ছে ওটা কি করবে, কিন্তু এমনটি যদি কোডিং এ, তাহলে? অনেক কিছুই কিন্তু করা যাবে। কিন্তু এই ধরনের কাজের পূর্বশর্তের জন্যে সব ল্যাঙ্গুয়েজ এমন কিছু করতে পারে না, স্কালাতে সম্ভব ২ ১০ ভার্শনের পর, হ্যাস্কেল এ করা যায়, কিন্তু সবচেয়ে ভালভাবে ও জনপ্রিয়ভাবে করে লিস্প পরিবারের ল্যাঙ্গুয়েজগুলি, আর তাও করে আসছে ১৯৬০ সাল থেকেই। আর এভাল এর এভিল দুর্নাম লিস্পের উপর পরে না কারণ এর হোমো-আইকনিসিটি, অর্থাৎ কোড = ডাটা। আর কম্পাইল টাইমেই এরর চেক হয়ে যায়। </p>
+<p>আমার আজকের পোষ্ট মূলত মোটিভেশন দেয়া ম্যাক্রো বিষয়ে। লিস্পের এই কালচার অন্য ল্যাঙ্গুয়েজে অনুপস্থিত তাই শুধু এই কনসেপটের উপস্থিতিই যথেষ্ট লিস্প শিখার জন্য (আরও অনেক অনেক কারণ আছে আপনাকে লিস্প শিখানর জন্যে) । আমার পরবর্তী পোস্ট থাকবে লিস্পের বেসিক টিউটোরিয়াল নিয়ে, আমি একটি পুরাতন লিস্প (স্কিম) ও নতুন লিস্প (ক্লোজার, এইবার ল্যাঙ্গুয়েজ Clojure) নিয়ে মূলত আগাবো। </p>
+<p>শেষ করার আগে কিছু লিস্প কোড দেখিয়ে যাই (Clojure)</p>
+<pre><code class="prettyprint">
+;; SQL Korma: <a href="http://sqlkorma.com/" target="_blank">http://sqlkorma.com/</a>
+
+(select users
+ (fields :first)
+ (with email
+   (fields :email) ;; the context is now email.*
+   (where {:email [like "%_test%"]})))
+
+(update users
+  (set-fields {:status "active"
+               :beta false})
+  (where {:visits [&gt; 10]}))
+  
+(intersect
+  (queries (subselect users
+             (where {:id [in [1 7]]}))
+           (subselect users
+             (where {:id 1}))
+           (subselect users
+             (where {:id 1})))
+  (order :first))
+
+</code></pre>
+<pre><code class="prettyprint">
+;; Hiccup: <a href="https://github.com/weavejester/hiccup" target="_blank">https://github.com/weavejester/hiccup</a>
+(defn hello []
+  [:div {:class "well"}
+    [:h1 {:class "text-info"} "Hello Hiccup and AngularJS"]
+    [:div {:class "row"}
+      [:div {:class "col-lg-2"}
+      (label "name" "Name:")]
+    [:div {:class "col-lg-4"}
+      (text-field {:class "form-control" 
+                   :ng-model "yourName" 
+                   :placeholder "Enter a name here"} 
+        "your-name")]]
+   [:hr]
+   [:h1 {:class "text-success"} 
+        "Hello {{yourName}}!"]])
+</code></pre>
+<pre><code class="prettyprint">
+(defproject algorithms-in-clojure "0.1.0-SNAPSHOT"
+  :description "Implementation of various algorithms with Clojure"
+  :url "http://example.com/FIXME"
+  :license {:name "Eclipse Public License"
+            :url "http://www.eclipse.org/legal/epl-v10.html"}
+  :main algorithms-in-clojure.core
+  :profiles {:dev {:plugins [[lein-midje "LATEST"]
+                             [codox "LATEST"]]}}
+  :dependencies [[org.clojure/clojure "1.6.0"]
+                 [midje "LATEST"]])
+</code></pre>
+<pre><code class="prettyprint">
+(fact "2 * 2 equals 4"
+  (* 2 2) =&gt; 4)
+
+(fact "Insertion sort is done right"
+  (insertion-sort '(2 4 0 2 1 0 0) &lt;) =&gt; '(0 0 0 1 2 2 4)
+  (insertion-sort '(2 4 0 2 1 0 0) &gt;) =&gt; '(4 2 2 1 0 0 0))
+</code></pre>
+<p>সবই কিন্তু একটি ল্যাঙ্গুয়েজেই করা।</p>
+                
+                
+                
+                
+                
+                
+                                <div id="footer">
+                <span id="timestamp"> September 28th, 2014 8:17pm </span>
+                                                      <span class="tag">Lisp</span>
+                                      <span class="tag">macro</span>
+                                      <span class="tag">programming</span>
+                                      <span class="tag">polyglot</span>
+                                              </div>
+            </body>
+        </html>
+
+        

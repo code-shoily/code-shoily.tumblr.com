@@ -1,0 +1,71 @@
+        <!DOCTYPE HTML>
+        <html>
+            <head>
+                <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+                <link rel="stylesheet" type="text/css" href="../style.css"/>
+            </head>
+            <body>
+                
+                
+                                    <h1>জ্যাঙ্গোকে মাইক্রো-ফ্রেমওয়ার্কের মতো ব্যবহার করা</h1>
+                    <p><u>[ নোট- এভাবে ব্যবহার করলে জ্যাঙ্গোর আসল শক্তি পাবেন না, কিন্তু এক্সপেরিমেন্ট করা ভালো ]</u></p>
+<p>অনেকেই আজকাল ফ্লাস্কের কথা বলে, খুব সহজে আপনি ওয়েব অ্যাপ্লিকেশান বানাতে পারবেন এটি দিয়ে, আবার বড় অ্যাপ্লিকেশান হলেও এর কিছু প্যাটার্ন রয়েছে যা ফলো করে আপনি ফ্লাস্ক দিয়ে মোটামোটি বড় মানের অ্যাপও তৈরী করতে পারবেন। জ্যাঙ্গো আপনার অ্যাপ্লিকেশানকে ভারী করে ফেলে এবং আপনি আটকে থাকেন খামাখা কিছু ফাইল নিয়ে যা হয়ত আপনি ব্যবহার করবেন না।</p>
+<p>কেননা, জ্যাঙ্গোকে ছোট করি? ফ্লাস্কের মতই বানাই? তা কিন্তু খুব সহজেই সম্ভব। আপনি একটি ফাইল তৈরী করবেন, এবং ওই ফাইলকে রান করলেই চলবে আপনার অ্যাপ্লিকেশান।</p>
+<p>১) প্রথমে একটি ফোল্ডার খোলা যাক, যার নাম দেই project, যথারীতি __init__.py টাচ করি।</p>
+<p>২) ওখানে, একটি ফাইল সৃষ্টি করি, main নামে।</p>
+<p>৩) ওই ফাইলটিই হবে আমাদের রানাবল ফাইল যা ক্ষুদ্র জ্যাঙ্গো প্রোগ্রাম চালাবে।</p>
+<p>৪) ওই ফাইলটিতে manage.py এর মশলা আনতে হবে এবং তাকেই রানাবল করতে হবে execute_from_commandline ফাংশন দিয়ে।</p>
+<p>৫) settings.py থাকবে না, আর এই ফাইলটিতেই থাকবে settings এর কনফিগারেশন, বার বার যাতে কনফিগার না করা হয় কাজেই configured প্রপার্টির ব্যবহার করতে হবে।</p>
+<p>৬) settings.py একটি পাইথন ফাইল, এর সব ভারিয়েবল, configure নামক ফাংশনের মাধ্যমে জ্যাঙ্গোর কাছে পরিচিত হয়, আর তা হয় মাত্র একবার। আমরা আমাদের main.py তেও তাই করব।</p>
+<p>৭) urls এর রুট আমরা এই ফাইলটিকেই বলব, এবং এর একটি লিস্ট ফাইলের প্রথমে ডিক্লেয়ার করব।</p>
+<p>৮) এরপর আমরা ইচ্ছেমত ভিউ বানাব।</p>
+<p>এখন আমাদের কোডটি দাঁড়াবে-</p>
+<pre><code class="prettyprint">
+from django.core.management import execute_from_command_line
+from django.conf import settings
+from django.http import HttpResponse
+from django.conf.urls import patterns
+
+
+settings_dict = {"DEBUG": True, "ROOT_URLCONF": 'main'}
+urls = ['^$', 'index'], ['^about/$', 'about']
+
+settings.configure(**settings_dic) if not settings.configured else None
+urlpatterns = patterns('main', *urls)
+
+def index(request):
+    return HttpResponse("Hello World")
+
+def about(request):
+    return HttpResponse("About")
+
+if __name__ == '__main__':
+    execute_from_command_line()
+</code></pre>
+<p>এখন এটা তো গেল আমাদের প্রথম প্রচেষ্টা, এরপর যদি আপনি আরও অগ্রসর হতে চান, তাহলে এই ধরনের কিছু ইম্পোরট এবং সেটিংস্ এর ওই লাইনটিকে আরেকটি ফাইলে রাখতে পারেন, আরও তৈরী করতে পারেন কিছু ডেকোরেটর যেমন, @url, @view ইত্যাদি, এবং সেগুলিকেও সে ফাইলে রাখতে পারেন, আমরা ওই ফাইলটিকে বলতে পারি micro.py, আর সাথে সাথে INSTALLED_APPS কেও এনে নিতে পারি, তখন আমাদের কোড দাঁড়াবে-</p>
+<pre><code class="prettyprint">
+from micro import *
+
+
+@url("/about")
+@view(render_to="about.html")
+def about(request):
+    return { "name": "Tiny Little Django", "content": "Lorem Ipsum.." }
+</code></pre>
+<p>আপনি <a href="https://github.com/sametmax/django-quicky" target="_blank">এখান থেকে</a> এর একটি সুন্দর উপকরণ পাবেন।</p>
+<p>এইভাবে কোড করলে জ্যাঙ্গো থেকেও আপনি স্বাধীনতা পাবেন, যেমন, আপনি চাইলেই SQLAlchemy, Jinja, Mako ইত্যাদি ব্যবহার করতে পারবেন, আবার জ্যাঙ্গোর সমস্ত ব্যাটারি তো আছেই, আবার নিজে থেকে কিছু ইউটিলিটি ফাংশন লিখে আপনি নিজেই মাইক্রো-ফ্রেমওয়ার্ক বানিয়ে ফেলতে পারবেন একে, এটি তো একটি উদাহরণ মাত্র, এর উপর আপনি আপনার ইচ্ছামতো কাচি চালাতে পারবেন আর যেভাবে খুশি সেভাবে জ্যাঙ্গোকে ব্যবহার করতে পারবেন। আমি চিন্তা করছি এই পোস্টটির শেষে দেওয়া আইডিয়া কাজে লাগিয়ে একটি ফাইল বানাব যার মধ্যে থাকবে খুব তাড়াতাড়ি জ্যাঙ্গো প্রজেক্টকে মাইক্রো স্টাইলে ব্যবহার করার মশলা, দেখা যাক সময় পাই কিনা।</p>
+                
+                
+                
+                
+                
+                
+                                <div id="footer">
+                <span id="timestamp"> October 5th, 2014 10:30pm </span>
+                                                      <span class="tag">django</span>
+                                      <span class="tag">discussion</span>
+                                              </div>
+            </body>
+        </html>
+
+        
